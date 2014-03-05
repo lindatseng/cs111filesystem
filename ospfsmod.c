@@ -627,8 +627,11 @@ free_block(uint32_t blockno)
 static int32_t
 indir2_index(uint32_t b)
 {
-	// Your code here.
-	return -1;
+	// Return 0 if b is in the range of doubly indirect block
+	if (b >= OSPFS_NDIRECT + OSPFS_NINDIRECT && b < OSPFS_MAXFILEBLKS)
+		return 0;
+	else
+		return -1;
 }
 
 
@@ -646,8 +649,14 @@ indir2_index(uint32_t b)
 static int32_t
 indir_index(uint32_t b)
 {
-	// Your code here.
-	return -1;
+	// Return 0 if b is in the range of file's first indirect block
+	if (b >= OSPFS_NDIRECT && b < OSPFS_NDIRECT + OSPFS_NINDIRECT)
+		return 0;
+	// if b is in the range of doubly indirect block
+	else if (b >= OSPFS_NDIRECT + OSPFS_NINDIRECT && b < OSPFS_MAXFILEBLKS)
+		return (b - OSPFS_NDIRECT - OSPFS_NINDIRECT) / OSPFS_NINDIRECT;
+	else 
+		return -1;
 }
 
 
@@ -663,8 +672,17 @@ indir_index(uint32_t b)
 static int32_t
 direct_index(uint32_t b)
 {
-	// Your code here.
-	return -1;
+	// file's direct block
+	if (b < OSPFS_NDIRECT)
+		return b;
+	// file's first indirect block
+	else if (b >= OSPFS_NDIRECT && b < OSPFS_NDIRECT + OSPFS_NINDIRECT)
+		return b - OSPFS_NDIRECT;
+	//file's doubly indirect block
+	else if (b >= OSPFS_NDIRECT + OSPFS_NINDIRECT && b < OSPFS_MAXFILEBLKS)
+		return (b - OSPFS_NDIRECT - OSPFS_NINDIRECT) % OSPFS_NINDIRECT;
+	else
+		return -1; // Should not be here
 }
 
 
