@@ -644,7 +644,7 @@ indir2_index(uint32_t b)
 //	    otherwise, the offset of the relevant indirect block within
 //		the doubly indirect block.
 //
-// EXERCISE: Fill in this function.
+// COMPLETED: Fill in this function.
 
 static int32_t
 indir_index(uint32_t b)
@@ -667,7 +667,7 @@ indir_index(uint32_t b)
 // Returns: the index of block b in the relevant indirect block or the direct
 //	    block array.
 //
-// EXERCISE: Fill in this function.
+// COMPLETED: Fill in this function.
 
 static int32_t
 direct_index(uint32_t b)
@@ -800,6 +800,7 @@ remove_block(ospfs_inode_t *oi)
 //
 //   EXERCISE: Finish off this function.
 
+/* COMPLETED */
 static int
 change_size(ospfs_inode_t *oi, uint32_t new_size)
 {
@@ -807,17 +808,39 @@ change_size(ospfs_inode_t *oi, uint32_t new_size)
 	int r = 0;
 
 	while (ospfs_size2nblocks(oi->oi_size) < ospfs_size2nblocks(new_size)) {
-	        /* EXERCISE: Your code here */
-		return -EIO; // Replace this line
+
+		// Add a block at a time
+		r = add_block(oi);
+
+		// Shrink the file back to the original size
+		if (r == -ENOSPC) {
+			while (ospfs_size2nblocks(oi->oi_size) > ospfs_size2nblocks(old_size)) {
+				r = remove_block(oi);
+
+				// Return if error
+				if (r < 0)
+					return r;
+			}
+			return -ENOSPC;
+		}
+
+		// Return if any other errors
+		if (r < 0)
+			return r;
 	}
 	while (ospfs_size2nblocks(oi->oi_size) > ospfs_size2nblocks(new_size)) {
-	        /* EXERCISE: Your code here */
-		return -EIO; // Replace this line
+	    
+	    // Remove a block at a time
+	    r = remove_block(oi);
+
+		// Return if error
+		if (r < 0)
+			return r;
 	}
 
-	/* EXERCISE: Make sure you update necessary file meta data
-	             and return the proper value. */
-	return -EIO; // Replace this line
+	// Update size of the file
+	oi->oi_size = new_size;
+	return 0;
 }
 
 
