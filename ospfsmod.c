@@ -1641,7 +1641,7 @@ ospfs_follow_link(struct dentry *dentry, struct nameidata *nd)
 	// Exercise: Your code here.
 
 	// Only support "root?" for conditional symlink in this lab
-	if (strcmp(oi->oi_symlink, "root?", 5) == 0) {
+	if (strncmp(oi->oi_symlink, "root?", 5) == 0) {
 		int i;
 		for (i = 0; i < strlen(oi->oi_symlink); i++) {
 			if (oi->oi_symlink[i] == ':') {
@@ -1654,10 +1654,10 @@ ospfs_follow_link(struct dentry *dentry, struct nameidata *nd)
 
 		// root user
 		if (uid == 0) {
-			nd_set_link(nd, oi_symlink + 5);
+			nd_set_link(nd, oi->oi_symlink + 5);
 			return (void *) 0;
 		} else {
-			nd_set_link(nd, oi_symlink + i + 1);
+			nd_set_link(nd, oi->oi_symlink + i + 1);
 			return (void *) 0;
 		}
 	}
