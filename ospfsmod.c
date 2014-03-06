@@ -438,7 +438,7 @@ ospfs_dir_lookup(struct inode *dir, struct dentry *dentry, struct nameidata *ign
 //   Returns: 1 at end of directory, 0 if filldir returns < 0 before the end
 //     of the directory, and -(error number) on error.
 //
-//   EXERCISE: Finish implementing this function.
+//   COMPLETED: Finish implementing this function.
 
 static int
 ospfs_dir_readdir(struct file *filp, void *dirent, filldir_t filldir)
@@ -462,7 +462,6 @@ ospfs_dir_readdir(struct file *filp, void *dirent, filldir_t filldir)
 		if (ok_so_far >= 0)
 			f_pos++;
 	}
-	uint32_t start_pos = f_pos;
 
 	// actual entries
 	while (r == 0 && ok_so_far >= 0 && f_pos >= 2) {
@@ -472,8 +471,8 @@ ospfs_dir_readdir(struct file *filp, void *dirent, filldir_t filldir)
 		/* If at the end of the directory, set 'r' to 1 and exit
 		 * the loop.  For now we do this all the time.
 		 *
-		 * EXERCISE: Your code here */
-		if (f_pos >= dir_oi->oi_size + start_pos) {
+		 * COMPLETED: Your code here */
+		if (f_pos >= dir_oi->oi_size) {
 			r = 1;
 			break;
 		}
@@ -510,7 +509,7 @@ ospfs_dir_readdir(struct file *filp, void *dirent, filldir_t filldir)
 		 * advance to the next directory entry.
 		 */
 
-		/* EXERCISE: Your code here */
+		/* COMPLETED: Your code here */
 	}
 
 	// Save the file position and return!
@@ -556,6 +555,12 @@ ospfs_unlink(struct inode *dirino, struct dentry *dentry)
 
 	od->od_ino = 0;
 	oi->oi_nlink--;
+
+	// Symbolic Link Handling
+	// if (oi->oi_ftype == OSPFS_FTYPE_SYMLINK) {
+	// 	oi = (ospfs_symlink_inode_t)oi;
+	// }
+
 	return 0;
 }
 
