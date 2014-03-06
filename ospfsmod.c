@@ -592,6 +592,34 @@ static void
 free_block(uint32_t blockno)
 {
 	/* EXERCISE: Your code here */
+
+	// boot sector and superblock should not be freed
+	if (blockno < OSPFS_FREEMAP_BLK)
+		return;
+
+	uint32_t bitmapEnd = ospfs_super->os_firstinob - 1;
+
+	// free-block bitmap should not be freed
+	if (blockno >= OSPFS_FREEMAP_BLK && blockno <= bitmapEnd)
+		return;
+
+	// inode blocks should not be freed
+	if (blockno > bitmapEnd && blockno <= bitmapEnd + ospfs_super->os_ninodes)
+		return;
+
+	// Out of boundries
+	if (blockno >= os_nblocks)
+		return;
+
+	uint32_t index = blockno / OSPFS_BLKBITSIZE;
+	uint32_t offset = blockno % OSPFS_BLKBITSIZE;
+	void* ptrToBitmap = ospfs_block(OSPFS_FREEMAP_BLK + index);
+
+	if (bitvector_test(ptrToBitmap, offset) == 1)
+		return;
+
+	// Set bit of vector to 1, which indicates the corresponding block is free.
+	bitvector_set(ptrToBitmap, offset);
 }
 
 
