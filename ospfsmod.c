@@ -1627,7 +1627,7 @@ ospfs_symlink(struct inode *dir, struct dentry *dentry, const char *symname)
 //   Inputs: dentry -- the symbolic link's directory entry
 //           nd     -- to be filled in with the symbolic link's destination
 //
-//   Exercise: Expand this function to handle conditional symlinks.  Conditional
+//   COMPLETED: Expand this function to handle conditional symlinks.  Conditional
 //   symlinks will always be created by users in the following form
 //     root?/path/1:/path/2.
 //   (hint: Should the given form be changed in any way to make this method
@@ -1638,7 +1638,7 @@ ospfs_follow_link(struct dentry *dentry, struct nameidata *nd)
 {
 	ospfs_symlink_inode_t *oi =
 		(ospfs_symlink_inode_t *) ospfs_inode(dentry->d_inode->i_ino);
-	// Exercise: Your code here.
+	// COMPLETED: Your code here.
 
 	// Only support "root?" for conditional symlink in this lab
 	if (strncmp(oi->oi_symlink, "root?", 5) == 0) {
