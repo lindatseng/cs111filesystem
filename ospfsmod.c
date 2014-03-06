@@ -627,7 +627,7 @@ free_block(uint32_t blockno)
 		return;
 
 	// Out of boundries
-	if (blockno >= os_nblocks)
+	if (blockno >= ospfs_super->os_nblocks)
 		return;
 
 	uint32_t index = blockno / OSPFS_BLKBITSIZE;
@@ -956,7 +956,7 @@ ospfs_read(struct file *filp, char __user *buffer, size_t count, loff_t *f_pos)
 	
 	if (*f_pos >= oi->oi_size) {
 		count = 0;
-	} else if (*f_pos + count > oi->oi_size) //cannot read pass the file
+	} else if (*f_pos + count > oi->oi_size) { //cannot read pass the file
 		count = oi->oi_size - *f_pos;
 	}
 
