@@ -616,7 +616,7 @@ free_block(uint32_t blockno)
 	if (blockno < OSPFS_FREEMAP_BLK)
 		return;
 
-	uint32_t bitmapEnd = (uint32_t) ospfs_super->os_firstinob - 1;
+	uint32_t bitmapEnd = ospfs_super->os_firstinob - 1;
 
 	// free-block bitmap should not be freed
 	if (blockno >= OSPFS_FREEMAP_BLK && blockno <= bitmapEnd)
@@ -630,8 +630,8 @@ free_block(uint32_t blockno)
 	if (blockno >= ospfs_super->os_nblocks)
 		return;
 
-	uint32_t index = (uint32_t) blockno / OSPFS_BLKBITSIZE;
-	uint32_t offset = (uint32_t) blockno % OSPFS_BLKBITSIZE;
+	uint32_t index = blockno / OSPFS_BLKBITSIZE;
+	uint32_t offset = blockno % OSPFS_BLKBITSIZE;
 	void* ptrToBitmap = ospfs_block(OSPFS_FREEMAP_BLK + index);
 
 	if (bitvector_test(ptrToBitmap, offset) == 1)
@@ -802,7 +802,8 @@ add_block(ospfs_inode_t *oi)
 
 			memset(ospfs_block(allocated[1]), 0, OSPFS_BLKSIZE);
 			oi->oi_indirect = allocated[0];
-			ospfs_block(oi->oi_indirect)[0] = allocated[1];
+			uint32_t* indirBlk = (uint32_t *) ospfs_block(oi->oi_indirect);
+			indirBlk[0] = allocated[1];
 		} else {
 			allocated[0]= allocate_block();
 			
@@ -810,7 +811,8 @@ add_block(ospfs_inode_t *oi)
 				return -ENOSPC;
 
 			memset(ospfs_block(allocated[0]), 0, OSPFS_BLKSIZE);
-			ospfs_block(oi->oi_indirect)[direct_index(n)] = allocated[0];
+			uint32_t* indirBlk = (uint32_t *) ospfs_block(oi->oi_indirect);
+			indirBlk[direct_index(n)] = allocated[0];
 		}
 	} else if (n >= OSPFS_NDIRECT + OSPFS_NINDIRECT && n < OSPFS_MAXFILEBLKS) {
 
@@ -842,8 +844,10 @@ add_block(ospfs_inode_t *oi)
 			memset(ospfs_block(allocated[2]), 0, OSPFS_BLKSIZE);
 
 			oi->oi_indirect2 = allocated[0];
-			ospfs_block(oi->oi_indirect2)[0] = allocated[1];
-			ospfs_block(oi->oi_indirect2[0])[0] = allocated[2];
+			uint32_t* indir2Blk = (uint32_t *) ospfs_block(oi->oi_indirect2);
+			indir2Blk[0] = allocated[1];
+			uint32_t* indirBlk = (uint32_t) ospfs_block(oi->oi_indirect2[0]);
+			indirBlk[0] = allocated[2];
 		} else if (direct_index(n) == 0) {
 			allocated[0]= allocate_block();
 			
@@ -861,8 +865,10 @@ add_block(ospfs_inode_t *oi)
 
 			memset(ospfs_block(allocated[1]), 0, OSPFS_BLKSIZE);
 
-			ospfs_block(oi->oi_indirect2)[indir_index(n)] = allocated[0];
-			ospfs_block(oi->oi_indirect2[indir_index(n)])[0] = allocated[1];
+			uint32_t* indir2Blk = (uint32_t *) ospfs_block(oi->oi_indirect2);
+			indir2Blk[indir_index(n)] = allocated[0];
+			uint32_t* indirBlk = (uint32_t) ospfs_block(oi->oi_indirect2[indir_index(n)]);
+			indirBlk[0] = allocated[1];
 		} else {
 			allocated[0]= allocate_block();
 			
@@ -870,8 +876,8 @@ add_block(ospfs_inode_t *oi)
 				return -ENOSPC;
 
 			memset(ospfs_block(allocated[0]), 0, OSPFS_BLKSIZE);
-
-			ospfs_block(oi->oi_indirect2[indir_index(n)])[direct_index(n)] = allocated[0];
+			uint32_t* indirBlk = (uint32_t) ospfs_block(oi->oi_indirect2[indir_index(n)]);
+			indirBlk[direct_index(n)] = allocated[0];
 		}
 	} else 
 		return -ENOSPC;
