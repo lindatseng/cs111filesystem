@@ -616,7 +616,7 @@ free_block(uint32_t blockno)
 	if (blockno < OSPFS_FREEMAP_BLK)
 		return;
 
-	uint32_t bitmapEnd = ospfs_super->os_firstinob - 1;
+	uint32_t bitmapEnd = (uint32_t) ospfs_super->os_firstinob - 1;
 
 	// free-block bitmap should not be freed
 	if (blockno >= OSPFS_FREEMAP_BLK && blockno <= bitmapEnd)
@@ -630,8 +630,8 @@ free_block(uint32_t blockno)
 	if (blockno >= ospfs_super->os_nblocks)
 		return;
 
-	uint32_t index = blockno / OSPFS_BLKBITSIZE;
-	uint32_t offset = blockno % OSPFS_BLKBITSIZE;
+	uint32_t index = (uint32_t) blockno / OSPFS_BLKBITSIZE;
+	uint32_t offset = (uint32_t) blockno % OSPFS_BLKBITSIZE;
 	void* ptrToBitmap = ospfs_block(OSPFS_FREEMAP_BLK + index);
 
 	if (bitvector_test(ptrToBitmap, offset) == 1)
@@ -771,7 +771,7 @@ add_block(ospfs_inode_t *oi)
 	uint32_t n = ospfs_size2nblocks(oi->oi_size);
 
 	// keep track of allocations to free in case of -ENOSPC
-	uint32_t *allocated[3] = { 0, 0, 0 };
+	uint32_t allocated[3] = { 0, 0, 0 };
 
 	/* EXERCISE: Your code here */
 
@@ -782,7 +782,7 @@ add_block(ospfs_inode_t *oi)
 			return -ENOSPC;
 
 		memset(ospfs_block(allocated[0]), 0, OSPFS_BLKSIZE);
-		oi->oi_direct[n] = blockno;
+		oi->oi_direct[n] = allocated[0];
 	} else if (n >= OSPFS_NDIRECT && n < OSPFS_NDIRECT + OSPFS_NINDIRECT) {
 
 		if (n == OSPFS_NDIRECT) {
