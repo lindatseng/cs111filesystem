@@ -608,7 +608,7 @@ free_block(uint32_t blockno)
 		return;
 
 	// Out of boundries
-	if (blockno >= os_nblocks)
+	if (blockno >= ospfs_super->os_nblocks)
 		return;
 
 	uint32_t index = blockno / OSPFS_BLKBITSIZE;
