@@ -1538,7 +1538,62 @@ ospfs_symlink(struct inode *dir, struct dentry *dentry, const char *symname)
 	uint32_t entry_ino = 0;
 
 	/* EXERCISE: Your code here. */
-	return -EINVAL;
+	ospfs_symlink_inode_t *file_oi = NULL;
+	ospfs_direntry_t *new_entry = NULL;
+	uint32_t block_no = 0;
+	struct inode *i;
+
+	// check if file type is directory
+	if (dir_oi->oi_ftype != OSPFS_FTYPE_DIR) { 
+		return -EIO;
+	}
+
+	// check if either name is too long
+	if ((dentry->d_name.len > OSPFS_MAXSYMLINKLEN) || 
+		(strlen(symname) > OSPFS_MAXSYMLINKLEN))
+		return -ENAMETOOLONG;
+
+	// check if file name already exists
+	if (find_direntry(dir_oi, dentry->d_name.name, dentry->d_name.len) != NULL)
+		return -EEXIST;
+
+	// Step 1: Create a new inode for new file
+
+	// Get an inode 
+	entry_ino = find_free_inode(); // Tuan: I have this function impelemented above.
+		// return inode number if it finds a free inode. return 0 otherwise.	
+		// How do we know if an inode is free? when its link count equals 0.	
+
+	if(entry_ino == 0) {
+		return -ENOSPC;
+	}
+
+	file_oi = ospfs_inode(entry_ino); // load ospfs_inode structure from disk
+
+	if (file_oi == NULL) {
+		return -EIO;
+	}
+
+	// Initialize the new inode structure with correct values
+	file_oi->oi_size = 0; //File size
+	file_oi->oi_ftype = OSPFS_FTYPE_SYMLINK;
+	file_oi->oi_nlink = 1; //Number of hard links
+	memcpy(file_oi->oi_symlink, symname, strlen(symname));
+
+	// Step 2: Create a new directory entry for new file
+
+	// As part of this lab, we need to implement create_blank_direntry
+	new_entry = create_blank_direntry(dir_oi); //create a blank directory entry in that directory
+		//This function returns a pointer to a directory entry which we can modify.
+	
+	if(IS_ERR(new_entry)) {
+		return PTR_ERR(new_entry);
+	}
+
+	// Initialize the new directory entry with correct values
+	new_entry->od_ino = entry_ino;
+	memcpy(new_entry->od_name, dentry->d_name.name, dentry->d_name.len);
+	new_entry->od_name[dentry->d_name.len] = '\0';
 
 	/* Execute this code after your function has successfully created the
 	   file.  Set entry_ino to the created file's inode number before
@@ -1641,6 +1696,6 @@ module_init(init_ospfs_fs)
 module_exit(exit_ospfs_fs)
 
 // Information about the module
-MODULE_AUTHOR("Skeletor");
+MODULE_AUTHOR("Li and Spencer");
 MODULE_DESCRIPTION("OSPFS");
 MODULE_LICENSE("GPL");
