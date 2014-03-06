@@ -846,7 +846,7 @@ add_block(ospfs_inode_t *oi)
 			oi->oi_indirect2 = allocated[0];
 			uint32_t* indir2Blk = (uint32_t *) ospfs_block(oi->oi_indirect2);
 			indir2Blk[0] = allocated[1];
-			uint32_t* indirBlk = (uint32_t) ospfs_block(oi->oi_indirect2[0]);
+			uint32_t* indirBlk = (uint32_t) ospfs_block(indir2Blk[0]);
 			indirBlk[0] = allocated[2];
 		} else if (direct_index(n) == 0) {
 			allocated[0]= allocate_block();
