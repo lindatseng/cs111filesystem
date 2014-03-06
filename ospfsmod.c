@@ -528,7 +528,7 @@ ospfs_dir_readdir(struct file *filp, void *dirent, filldir_t filldir)
 //
 //   Returns: 0 if success and -ENOENT on entry not found.
 //
-//   EXERCISE: Make sure that deleting symbolic links works correctly.
+//   COMPLETED: Make sure that deleting symbolic links works correctly.
 
 static int
 ospfs_unlink(struct inode *dirino, struct dentry *dentry)
@@ -569,7 +569,7 @@ ospfs_unlink(struct inode *dirino, struct dentry *dentry)
 /*****************************************************************************
  * FREE-BLOCK BITMAP OPERATIONS
  *
- * EXERCISE: Implement these functions.
+ * COMPLETED: Implement these functions.
  */
 
 // allocate_block()
@@ -665,7 +665,7 @@ free_block(uint32_t blockno)
 /*****************************************************************************
  * FILE OPERATIONS
  *
- * EXERCISE: Finish off change_size, read, and write.
+ * COMPLETED: Finish off change_size, read, and write.
  *
  * The find_*, add_block, and remove_block functions are only there to support
  * the change_size function.  If you prefer to code change_size a different
@@ -689,7 +689,7 @@ free_block(uint32_t blockno)
 // Returns: 0 if block index 'b' requires using the doubly indirect
 //	       block, -1 if it does not.
 //
-// EXERCISE: Fill in this function.
+// COMPLETED: Fill in this function.
 
 static int32_t
 indir2_index(uint32_t b)
@@ -769,7 +769,7 @@ direct_index(uint32_t b)
 //          then oi->oi_size should remain unchanged. Any newly
 //          allocated blocks should be erased (set to zero).
 //
-// EXERCISE: Finish off this function.
+// COMPLETED: Finish off this function.
 //
 // Remember that allocating a new data block may require allocating
 // as many as three disk blocks, depending on whether a new indirect
@@ -919,7 +919,7 @@ add_block(ospfs_inode_t *oi)
 //          instance if an indirect block that should be there isn't),
 //          then oi->oi_size should remain unchanged.
 //
-// EXERCISE: Finish off this function.
+// COMPLETED: Finish off this function.
 //
 // Remember that you must free any indirect and doubly-indirect blocks
 // that are no longer necessary after shrinking the file.  Removing a
@@ -934,7 +934,7 @@ remove_block(ospfs_inode_t *oi)
 	// current number of blocks in file
 	uint32_t n = ospfs_size2nblocks(oi->oi_size);
 
-	/* EXERCISE: Your code here */
+	/* COMPLETED: Your code here */
 
 	if (n <= 0)
 		return -EIO;
@@ -1007,7 +1007,7 @@ remove_block(ospfs_inode_t *oi)
 //         (The value that the final add_block or remove_block set it to
 //          is probably not correct).
 //
-//   EXERCISE: Finish off this function.
+//   COMPLETED: Finish off this function.
 
 /* COMPLETED */
 static int
@@ -1103,7 +1103,7 @@ ospfs_notify_change(struct dentry *dentry, struct iattr *attr)
 //   as 'f_pos'; read data starting at that position, and update the position
 //   when you're done.
 //
-//   EXERCISE: Complete this function.
+//   COMPLETED: Complete this function.
 
 static ssize_t
 ospfs_read(struct file *filp, char __user *buffer, size_t count, loff_t *f_pos)
@@ -1143,7 +1143,7 @@ ospfs_read(struct file *filp, char __user *buffer, size_t count, loff_t *f_pos)
 		// Copy data into user space. Return -EFAULT if unable to write
 		// into user space.
 		// Use variable 'n' to track number of bytes moved.
-		/* COMPLETED EXERCISE: Your code here */
+		/* COMPLETED: Your code here */
 
 		data_offset = *f_pos % OSPFS_BLKSIZE; //block size is 1024 bytes
 
@@ -1185,7 +1185,7 @@ ospfs_read(struct file *filp, char __user *buffer, size_t count, loff_t *f_pos)
 //   where you cannot read past the end of the file, it is OK to write past
 //   the end of the file; this should simply change the file's size.
 //
-//   EXERCISE: Complete this function.
+//   COMPLETED: Complete this function.
 
 static ssize_t
 ospfs_write(struct file *filp, const char __user *buffer, size_t count, loff_t *f_pos)
@@ -1196,13 +1196,13 @@ ospfs_write(struct file *filp, const char __user *buffer, size_t count, loff_t *
 
 	// Support files opened with the O_APPEND flag.  To detect O_APPEND,
 	// use struct file's f_flags field and the O_APPEND bit.
-	/* EXERCISE: Your code here */
+	/* COMPLETED: Your code here */
 	if (filp->f_flags &= O_APPEND)
 		*f_pos = oi->oi_size;
 
 	// If the user is writing past the end of the file, change the file's
 	// size to accomodate the request.  (Use change_size().)
-	/* EXERCISE: Your code here */
+	/* COMPLETED: Your code here */
 	if (*f_pos + count > oi->oi_size)
 		retval = change_size(oi, *f_pos + count);
 
@@ -1223,7 +1223,7 @@ ospfs_write(struct file *filp, const char __user *buffer, size_t count, loff_t *
 		// Copy data from user space. Return -EFAULT if unable to read
 		// read user space.
 		// Keep track of the number of bytes moved in 'n'.
-		/* EXERCISE: Your code here */
+		/* COMPLETED: Your code here */
 
 		n = OSPFS_BLKSIZE - *f_pos % OSPFS_BLKSIZE;
 
@@ -1299,7 +1299,7 @@ find_direntry(ospfs_inode_t *dir_oi, const char *name, int namelen)
 //
 //	The create_blank_direntry function should use this convention.
 //
-// EXERCISE: Write this function.
+// COMPLETED: Write this function.
 
 static ospfs_direntry_t *
 create_blank_direntry(ospfs_inode_t *dir_oi)
@@ -1371,7 +1371,7 @@ create_blank_direntry(ospfs_inode_t *dir_oi)
 //               -ENOSPC       if the disk is full & the file can't be created;
 //               -EIO          on I/O error.
 //
-//   EXERCISE: Complete this function.
+//   COMPLETED: Complete this function.
 
 static int
 ospfs_link(struct dentry *src_dentry, struct inode *dir, struct dentry *dst_dentry) {
@@ -1447,7 +1447,7 @@ ospfs_link(struct dentry *src_dentry, struct inode *dir, struct dentry *dst_dent
 //   2. Find an empty inode.  Set the 'entry_ino' variable to its inode number.
 //   3. Initialize the directory entry and inode.
 //
-//   EXERCISE: Complete this function.
+//   COMPLETED: Complete this function.
 
 static int
 ospfs_create(struct inode *dir, struct dentry *dentry, int mode, struct nameidata *nd)
