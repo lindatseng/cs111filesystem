@@ -572,7 +572,26 @@ ospfs_unlink(struct inode *dirino, struct dentry *dentry)
 static uint32_t
 allocate_block(void)
 {
-	/* EXERCISE: Your code here */
+	/* COMPLETED: Your code here */
+
+	uint32_t bitmapEnd = ospfs_super->os_firstinob - 1;
+
+	int index;
+	for (index = OSPFS_FREEMAP_BLK; index <= bitmapEnd; index++) {
+		void* ptrToBitmap = ospfs_block(index);
+
+		int offset;
+		for (offset = 0; offset < OSPFS_BLKBITSIZE; offset++) {
+			if (bitvector_test(ptrToBitmap, offset) == 1) {
+				bitvector_clear(ptrToBitmap, offset);
+
+				// return the block number
+				return (index - OSPFS_FREEMAP_BLK) * OSPFS_BLKBITSIZE + offset;
+			}
+		}
+	}
+
+	// return 0 if the disk is full
 	return 0;
 }
 
@@ -591,7 +610,7 @@ allocate_block(void)
 static void
 free_block(uint32_t blockno)
 {
-	/* EXERCISE: Your code here */
+	/* COMPLETED: Your code here */
 
 	// boot sector and superblock should not be freed
 	if (blockno < OSPFS_FREEMAP_BLK)
